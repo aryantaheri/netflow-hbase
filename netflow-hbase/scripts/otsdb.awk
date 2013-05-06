@@ -40,10 +40,10 @@
 
 #    proc.stat.cpu 1297574486 54.2 host=foo type=user
 
- print "no.uis.ux.netflow.ipkt", ts, $12, "sa="$4, "sp="$6, "da="$5, "dp="$7
- print "no.uis.ux.netflow.ibyt", ts, $13, "sa="$4, "sp="$6, "da="$5, "dp="$7
- print "no.uis.ux.netflow.opkt", ts, $14, "sa="$4, "sp="$6, "da="$5, "dp="$7
- print "no.uis.ux.netflow.obyt", ts, $15, "sa="$4, "sp="$6, "da="$5, "dp="$7
- print "no.uis.ux.netflow.flow", ts, $16, "sa="$4, "sp="$6, "da="$5, "dp="$7
+    if ( $12 != "0" ) print "no.uis.ux.netflow.ipkt", ts, $12, "sa="$4, "sp="$6, "da="$5, "dp="$7
+    if ( $13 != "0" ) print "no.uis.ux.netflow.ibyt", ts, $13, "sa="$4, "sp="$6, "da="$5, "dp="$7
+    if ( $14 != "0" ) print "no.uis.ux.netflow.opkt", ts, $14, "sa="$4, "sp="$6, "da="$5, "dp="$7
+    if ( $15 != "0" ) print "no.uis.ux.netflow.obyt", ts, $15, "sa="$4, "sp="$6, "da="$5, "dp="$7
+    if ( $16 != "0" ) print "no.uis.ux.netflow.flow", ts, $16, "sa="$4, "sp="$6, "da="$5, "dp="$7
 
 }
