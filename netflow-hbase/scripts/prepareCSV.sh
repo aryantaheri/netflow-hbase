@@ -35,9 +35,10 @@ do
     CWD=$CSV_DIR$day
     OTSDB_CWD=$OTSDB_DIR$day
     mkdir -p $CWD $OTSDB_CWD
-    $NFDUMP $day $NFDUMP_FMT > $CWD$FN
-    awk -F, -f $OTSDB_AWK $CWD$FN > $OTSDB_CWD$OTSDB_FN
-    gzip $CWD$FN
-    gzip $OTSDB_CWD$OTSDB_FN
+    $NFDUMP $day $NFDUMP_FMT | gzip > $CWD$FN.gz
+    awk -F, -f $OTSDB_AWK <(gzip -dc $CWD$FN.gz) | gzip > $OTSDB_CWD$OTSDB_FN.gz
+
+#    gzip $CWD$FN
+#    gzip $OTSDB_CWD$OTSDB_FN
 
 done
