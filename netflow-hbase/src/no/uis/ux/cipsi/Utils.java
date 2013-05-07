@@ -12,7 +12,7 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.thrift.generated.Hbase.getColumnDescriptors_args;
 import org.apache.hadoop.hbase.util.Bytes;
 
-public class Utils {
+public class Utils { 
 
 	private static final ArrayList<String> qualifiersMapping = new ArrayList<>(Arrays.asList(
 			"Date flow start",
@@ -30,6 +30,7 @@ public class Utils {
 			"In Byte",
 			"Out Pkt",
 			"Out Byte",
+			"Flows",
 			"Input",
 			"Output",
 			"Src AS",

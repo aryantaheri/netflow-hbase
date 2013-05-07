@@ -37,6 +37,15 @@ public class SimpleCSVImport {
 	private static HBaseAdmin hbaseAdmin;
 	private static String T1_TABLE_NAME = "T1";
 	private static String T2_TABLE_NAME = "T2";
+	
+	private static String T3_TABLE_NAME = "T3";
+	private static String T4_TABLE_NAME = "T4";
+	
+	private static String T5_TABLE_NAME = "T5";
+	private static String T6_TABLE_NAME = "T6";
+	
+	private static String T7_TABLE_NAME = "T7";
+	private static String T8_TABLE_NAME = "T8";
 
 	static class NetFlowT1ImportMapper extends
 			Mapper<LongWritable, Text, ImmutableBytesWritable, Writable> {
@@ -48,7 +57,7 @@ public class SimpleCSVImport {
 				throws IOException, InterruptedException {
 			netFlowCSVParser = new NetFlowCSVParser(
 					"Date flow start,Date flow end,Duration,Src IP Addr,"
-							+ "Dst IP Addr, Src Pt, Dst Pt ,Proto  ,Flags ,Fwd ,STos   ,In Pkt  ,In Byte  ,Out Pkt ,Out Byte  ,Input ,"
+							+ "Dst IP Addr, Src Pt, Dst Pt ,Proto  ,Flags ,Fwd ,STos   ,In Pkt  ,In Byte  ,Out Pkt ,Out Byte  ,Flows ,Input ,"
 							+ "Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      ,Next-hop IP  ,BGP next-hop IP ,SVlan ,DVlan   ,"
 							+ "In src MAC Addr  ,Out dst MAC Addr   ,In dst MAC Addr  ,Out src MAC Addr  , Router IP, MPLS lbl 1   ,MPLS lbl 2   ,"
 							+ "MPLS lbl 3   ,MPLS lbl 4", false);
@@ -63,6 +72,7 @@ public class SimpleCSVImport {
 				// Prepare T1 key
 				byte[] rowkeyT1 = netFlowCSVParser.prepareRowKeyT1(fields);
 				NetFlowCSVParser.printRowKeyT1(rowkeyT1);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT1, 1));
 
 				Put putT1 = new Put(rowkeyT1);
 				// Prepare T1 values
@@ -78,19 +88,52 @@ public class SimpleCSVImport {
 
 				// Prepare T2 key
 				byte[] rowkeyT2 = netFlowCSVParser.prepareRowKeyT2(fields);
-				NetFlowCSVParser.printRowKeyT2(rowkeyT2);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT2, 2));
 
-				Put putT2 = new Put(rowkeyT2);
 				// Prepare T2 values
-				List<CFQValue> valuesT2 = netFlowCSVParser
-						.prepareValuesT2(fields);
+				Put putT2 = new Put(rowkeyT2);
+				List<CFQValue> valuesT2 = netFlowCSVParser.prepareDummyValue();
 				for (CFQValue cfqValue : valuesT2) {
-					// System.out.println(NetFlowV5Record.decodeCFQValues(cfqValue));
-					putT2.add(cfqValue.getColumnFamily(),
-							cfqValue.getQualifier(), cfqValue.getValue());
+					putT2.add(cfqValue.getColumnFamily(), cfqValue.getQualifier(), cfqValue.getValue());
 				}
 				putT2.setWriteToWAL(false);
 
+				// Prepare T3 key
+				byte[] rowkeyT3 = netFlowCSVParser.prepareRowKeyT3(fields);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT3, 3));
+				Put putT3 = netFlowCSVParser.getDummyPut(rowkeyT3);
+				putT3.setWriteToWAL(false);				
+
+				// Prepare T4 key
+				byte[] rowkeyT4 = netFlowCSVParser.prepareRowKeyT4(fields);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT4, 4));
+				Put putT4 = netFlowCSVParser.getDummyPut(rowkeyT4);
+				putT4.setWriteToWAL(false);		
+				
+				// Prepare T5 key
+				byte[] rowkeyT5 = netFlowCSVParser.prepareRowKeyT5(fields);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT5, 5));
+				Put putT5 = netFlowCSVParser.getDummyPut(rowkeyT5);
+				putT5.setWriteToWAL(false);		
+				
+				// Prepare T6 key
+				byte[] rowkeyT6 = netFlowCSVParser.prepareRowKeyT6(fields);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT6, 6));
+				Put putT6 = netFlowCSVParser.getDummyPut(rowkeyT6);
+				putT6.setWriteToWAL(false);		
+				
+				// Prepare T7 key
+				byte[] rowkeyT7 = netFlowCSVParser.prepareRowKeyT7(fields);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT7, 7));
+				Put putT7 = netFlowCSVParser.getDummyPut(rowkeyT7);
+				putT7.setWriteToWAL(false);		
+
+				// Prepare T8 key
+				byte[] rowkeyT8 = netFlowCSVParser.prepareRowKeyT8(fields);
+				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT8, 8));
+				Put putT8 = netFlowCSVParser.getDummyPut(rowkeyT8);
+				putT8.setWriteToWAL(false);
+				
 				// Single table
 				// context.write(new ImmutableBytesWritable(rowkeyT1), put);
 
@@ -101,13 +144,37 @@ public class SimpleCSVImport {
 				context.write(
 						new ImmutableBytesWritable(T2_TABLE_NAME.getBytes()),
 						putT2);
+				context.write(
+						new ImmutableBytesWritable(T3_TABLE_NAME.getBytes()),
+						putT3);
+				context.write(
+						new ImmutableBytesWritable(T4_TABLE_NAME.getBytes()),
+						putT4);
+				context.write(
+						new ImmutableBytesWritable(T5_TABLE_NAME.getBytes()),
+						putT5);
+				context.write(
+						new ImmutableBytesWritable(T6_TABLE_NAME.getBytes()),
+						putT6);
+				context.write(
+						new ImmutableBytesWritable(T7_TABLE_NAME.getBytes()),
+						putT7);
+				context.write(
+						new ImmutableBytesWritable(T8_TABLE_NAME.getBytes()),
+						putT8);
+
+
 
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 
 		}
+		
+		
 	}
+	
+	
 
 	private static boolean doesTableExist(String tableName) throws IOException {
 		return hbaseAdmin.tableExists(tableName.getBytes());
@@ -130,11 +197,11 @@ public class SimpleCSVImport {
 	public static void main(String[] args) throws Exception {
 
 		Configuration conf = HBaseConfiguration.create();
-		String input = "data/csv/simple.csv";
+		String input = "data/csv/32.csv";
 //		String column = "";
 
 		// conf.set("conf.column", column);
-		Job job = new Job(conf, "Import NetFlow records from file " + input + " into tables: " + T1_TABLE_NAME + " and " + T2_TABLE_NAME);
+		Job job = new Job(conf, "Import NetFlow records from file " + input + " into 3 tables: " + T1_TABLE_NAME + " and " + T2_TABLE_NAME);
 		job.setJarByClass(SimpleCSVImport.class);
 		job.setMapperClass(NetFlowT1ImportMapper.class);
 		// job.setOutputFormatClass(TableOutputFormat.class);
@@ -161,6 +228,12 @@ public class SimpleCSVImport {
 		hbaseAdmin = new HBaseAdmin(conf);
 		createTable(conf, T1_TABLE_NAME);
 		createTable(conf, T2_TABLE_NAME);
+		createTable(conf, T3_TABLE_NAME);
+		createTable(conf, T4_TABLE_NAME);
+		createTable(conf, T5_TABLE_NAME);
+		createTable(conf, T6_TABLE_NAME);
+		createTable(conf, T7_TABLE_NAME);
+		createTable(conf, T8_TABLE_NAME);
 		FileInputFormat.addInputPath(job, new Path(input));
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 	}

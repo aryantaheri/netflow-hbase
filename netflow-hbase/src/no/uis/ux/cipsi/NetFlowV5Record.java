@@ -19,7 +19,7 @@ public class NetFlowV5Record {
 	
 	/**
 	 *  "Date flow start,Date flow end,Duration,Src IP Addr," +
-		"Dst IP Addr, Src Pt, Dst Pt ,Proto  ,Flags ,Fwd ,STos   ,In Pkt  ,In Byte  ,Out Pkt ,Out Byte  ,Input ," +
+		"Dst IP Addr, Src Pt, Dst Pt ,Proto  ,Flags ,Fwd ,STos   ,In Pkt  ,In Byte  ,Out Pkt ,Out Byte  ,Flows, Input ," +
 		"Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      ,Next-hop IP  ,BGP next-hop IP ,SVlan ,DVlan   ," +
 		"In src MAC Addr  ,Out dst MAC Addr   ,In dst MAC Addr  ,Out src MAC Addr  ,Router IP,MPLS lbl 1   ,MPLS lbl 2   ," +
 		"MPLS lbl 3   ,MPLS lbl 4"
@@ -31,7 +31,7 @@ public class NetFlowV5Record {
 	String tcpFlags = 0; // 6 char
 	short forwardingStatus = -1;
 	byte sourceTOS = 0, destinationTOS = 0;
-	long inPacket, outPacket // 4 bytes required-->long(8)
+	long inPacket, outPacket, inByte, outByte, flows // 4 bytes required-->long(8)
 	long sourceAS = -1l, destinationAS = -1l,
 			nextAS = -1l, previousAS = -1l;				// RFC 4893 introduced 32-bit AS numbers, using long(64) because there is no unsinged int in Java
 	InetAddress sourceMask, destinationMask;
@@ -135,6 +135,15 @@ public class NetFlowV5Record {
 					values.add(cfqValue);
 				}
 				break;		
+			
+				//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+			case "Flows":
+				long flows = Long.parseLong(fields.get(i));
+				if (flows != 0){
+					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(flows));
+					values.add(cfqValue);
+				}
+				break;	
 				
 				// Input ," +
 //				"Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      
@@ -328,11 +337,15 @@ public class NetFlowV5Record {
 			value = Bytes.toLong(cfqValue.getValue())+"";
 			break;				
 			
-			//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
 		case "Out Byte":
 			value = Bytes.toLong(cfqValue.getValue())+"";
 			break;		
 			
+		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+		case "Flows":
+			value = Bytes.toLong(cfqValue.getValue())+"";
+			break;
 			// Input ," +
 //			"Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      
 			
