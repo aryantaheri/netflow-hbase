@@ -14,7 +14,7 @@ import org.apache.hadoop.hbase.util.Bytes;
 
 public class Utils { 
 
-	private static final ArrayList<String> qualifiersMapping = new ArrayList<>(Arrays.asList(
+	private static final ArrayList<String> qualifiersMapping = new ArrayList<String>(Arrays.asList(
 			"Date flow start",
 			"Date flow end", 
 			"Duration",

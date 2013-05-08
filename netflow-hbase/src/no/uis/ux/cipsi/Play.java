@@ -132,7 +132,7 @@ public class Play {
 	}
 	
 	private static void lists(){
-		List<String> list1 = new ArrayList<>();
+		List<String> list1 = new ArrayList<String>();
 		list1.add("1");
 		list1.add("2");
 		list1.add("3");
@@ -160,7 +160,7 @@ public class Play {
 		}
 		
 		
-		List<String> list2 = new ArrayList<>();
+		List<String> list2 = new ArrayList<String>();
 		
 	}
 	
