@@ -71,16 +71,15 @@ public class SimpleCSVImport {
 
 				// Prepare T1 key
 				byte[] rowkeyT1 = netFlowCSVParser.prepareRowKeyT1(fields);
-				NetFlowCSVParser.printRowKeyT1(rowkeyT1);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT1, 1));
+//				NetFlowCSVParser.printRowKeyT1(rowkeyT1);
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT1, 1));
 
 				Put putT1 = new Put(rowkeyT1);
 				// Prepare T1 values
 				List<CFQValue> values = netFlowCSVParser
 						.prepareValuesT1(fields);
 				for (CFQValue cfqValue : values) {
-					System.out.println(NetFlowV5Record
-							.decodeCFQValues(cfqValue));
+//					System.out.println(NetFlowV5Record.decodeCFQValues(cfqValue));
 					putT1.add(cfqValue.getColumnFamily(),
 							cfqValue.getQualifier(), cfqValue.getValue());
 				}
@@ -88,7 +87,7 @@ public class SimpleCSVImport {
 
 				// Prepare T2 key
 				byte[] rowkeyT2 = netFlowCSVParser.prepareRowKeyT2(fields);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT2, 2));
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT2, 2));
 
 				// Prepare T2 values
 				Put putT2 = new Put(rowkeyT2);
@@ -100,37 +99,37 @@ public class SimpleCSVImport {
 
 				// Prepare T3 key
 				byte[] rowkeyT3 = netFlowCSVParser.prepareRowKeyT3(fields);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT3, 3));
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT3, 3));
 				Put putT3 = netFlowCSVParser.getDummyPut(rowkeyT3);
 				putT3.setWriteToWAL(false);				
 
 				// Prepare T4 key
 				byte[] rowkeyT4 = netFlowCSVParser.prepareRowKeyT4(fields);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT4, 4));
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT4, 4));
 				Put putT4 = netFlowCSVParser.getDummyPut(rowkeyT4);
 				putT4.setWriteToWAL(false);		
 				
 				// Prepare T5 key
 				byte[] rowkeyT5 = netFlowCSVParser.prepareRowKeyT5(fields);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT5, 5));
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT5, 5));
 				Put putT5 = netFlowCSVParser.getDummyPut(rowkeyT5);
 				putT5.setWriteToWAL(false);		
 				
 				// Prepare T6 key
 				byte[] rowkeyT6 = netFlowCSVParser.prepareRowKeyT6(fields);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT6, 6));
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT6, 6));
 				Put putT6 = netFlowCSVParser.getDummyPut(rowkeyT6);
 				putT6.setWriteToWAL(false);		
 				
 				// Prepare T7 key
 				byte[] rowkeyT7 = netFlowCSVParser.prepareRowKeyT7(fields);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT7, 7));
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT7, 7));
 				Put putT7 = netFlowCSVParser.getDummyPut(rowkeyT7);
 				putT7.setWriteToWAL(false);		
 
 				// Prepare T8 key
 				byte[] rowkeyT8 = netFlowCSVParser.prepareRowKeyT8(fields);
-				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT8, 8));
+//				System.out.println(NetFlowCSVParser.decodeRowKey(rowkeyT8, 8));
 				Put putT8 = netFlowCSVParser.getDummyPut(rowkeyT8);
 				putT8.setWriteToWAL(false);
 				
@@ -180,24 +179,36 @@ public class SimpleCSVImport {
 		return hbaseAdmin.tableExists(tableName.getBytes());
 	}
 
-	private static void createTable(Configuration conf, String tableName)
+	private static void createTable(Configuration conf, String tableName, boolean dropIfExist)
 			throws IOException {
 
-		if (doesTableExist(tableName))
-			return;
+		if (doesTableExist(tableName)){
+			if (!dropIfExist){
+				return;
+			}else{
+				hbaseAdmin.disableTable(tableName);
+				hbaseAdmin.deleteTable(tableName);
+			}
+		}
 
 		HTableDescriptor htd = new HTableDescriptor(tableName.getBytes());
 		HColumnDescriptor hcd = new HColumnDescriptor(NetFlowCSVParser.COLUMN_FAMILY_NAME.getBytes());
 		hcd.setMaxVersions(1);
 		hcd.setBlockCacheEnabled(false);
 		htd.addFamily(hcd);
+		
+		// pre-splitting regions and 
+		// region size must be handled here
+		// compression
 		hbaseAdmin.createTable(htd);
 	}
 
 	public static void main(String[] args) throws Exception {
 
 		Configuration conf = HBaseConfiguration.create();
-		String input = "data/csv/32.csv";
+//		String input = "data/csv/32.csv";
+		String input = "data/csv/oslo_gw.2013.04.10.csv";
+//		conf.set("hbase.zookeeper.quorum", "haisen24.ux.uis.no");
 //		String column = "";
 
 		// conf.set("conf.column", column);
@@ -226,14 +237,14 @@ public class SimpleCSVImport {
 		// table));
 
 		hbaseAdmin = new HBaseAdmin(conf);
-		createTable(conf, T1_TABLE_NAME);
-		createTable(conf, T2_TABLE_NAME);
-		createTable(conf, T3_TABLE_NAME);
-		createTable(conf, T4_TABLE_NAME);
-		createTable(conf, T5_TABLE_NAME);
-		createTable(conf, T6_TABLE_NAME);
-		createTable(conf, T7_TABLE_NAME);
-		createTable(conf, T8_TABLE_NAME);
+		createTable(conf, T1_TABLE_NAME, true);
+		createTable(conf, T2_TABLE_NAME, true);
+		createTable(conf, T3_TABLE_NAME, true);
+		createTable(conf, T4_TABLE_NAME, true);
+		createTable(conf, T5_TABLE_NAME, true);
+		createTable(conf, T6_TABLE_NAME, true);
+		createTable(conf, T7_TABLE_NAME, true);
+		createTable(conf, T8_TABLE_NAME, true);
 		FileInputFormat.addInputPath(job, new Path(input));
 		System.exit(job.waitForCompletion(true) ? 0 : 1);
 	}

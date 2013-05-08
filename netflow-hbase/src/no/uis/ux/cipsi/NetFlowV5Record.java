@@ -54,145 +54,142 @@ public class NetFlowV5Record {
 		List<CFQValue> values = new ArrayList<CFQValue>();
 		CFQValue cfqValue = null;
 		for (int i = 0; i < qualifiers.size(); i++) {
-			switch (Utils.getColumnQualifierString(qualifiers.get(i))) {
-			case "Date flow end":
+			String qString = Utils.getColumnQualifierString(qualifiers.get(i));
+			if (qString.equals("Date flow end")) {
 				long lastSeen = dateFormat.parse(fields.get(i)).getTime();
 				cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(lastSeen));
 				values.add(cfqValue);
-				break;
+				continue;
 
-			case "Proto":
+			} else if (qString.equals("Proto")){
 				short protocol = Short.parseShort(fields.get(i));
 				cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(protocol));
 				values.add(cfqValue);
-				break;
+				continue;
 				
 			// FIXME: use 9 bits to handle flags, instead of using a string.
-			case "Flags":
+			} else if (qString.equals("Flags")){
 				String flags = fields.get(i);
 				if (!flags.equals("......")){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(flags));
 					values.add(cfqValue);					
 				}
-				break;
+				continue;
 				
-			case "Fwd":	
+			} else if (qString.equals("Fwd")){	
 				short forwardingStatus = Short.parseShort(fields.get(i));
 				if (forwardingStatus != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(forwardingStatus));
 					values.add(cfqValue);					
 				}
-				break;
+				continue;
 				
-			case "STos":
+			} else if (qString.equals("STos")){
 				short stos = Short.parseShort(fields.get(i));
 				if (stos != 0)	{
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(stos));
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 
-			case "DTos":
+			} else if (qString.equals("DTos")){
 				short dtos = Short.parseShort(fields.get(i));
 				if (dtos != 0)	{
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(dtos));
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
 			//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-			case "In Pkt":
+			} else if (qString.equals("In Pkt")){
 				long inPacket = Long.parseLong(fields.get(i));
 				if (inPacket != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(inPacket));
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
 			//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-			case "Out Pkt":
+			} else if (qString.equals("Out Pkt")){
 				long outPacket = Long.parseLong(fields.get(i));
 				if (outPacket != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(outPacket));
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
 			//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-			case "In Byte":
+			} else if (qString.equals("In Byte")){
 				long inByte = Long.parseLong(fields.get(i));
 				if (inByte != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(inByte));
 					values.add(cfqValue);
 				}
-				break;				
+				continue;				
 				
 				//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-			case "Out Byte":
+			} else if (qString.equals("Out Byte")){
 				long outByte = Long.parseLong(fields.get(i));
 				if (outByte != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(outByte));
 					values.add(cfqValue);
 				}
-				break;		
+				continue;		
 			
 				//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-			case "Flows":
+			} else if (qString.equals("Flows")){
 				long flows = Long.parseLong(fields.get(i));
 				if (flows != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(flows));
 					values.add(cfqValue);
 				}
-				break;	
+				continue;	
 				
-				// Input ," +
-//				"Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      
-				
-			case "Input":
+			} else if (qString.equals("Input")){
 				short inputIF = Short.parseShort(fields.get(i));
 				cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(inputIF));
 				values.add(cfqValue);
-				break;
+				continue;
 				
-			case "Output":
+			} else if (qString.equals("Output")){
 				short outputIF = Short.parseShort(fields.get(i));
 				cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(outputIF));
 				values.add(cfqValue);
-				break;
+				continue;
 				
-			case "Src AS":
+			} else if (qString.equals("Src AS")){
 				long sourceAS = Long.parseLong(fields.get(i));
 				if (sourceAS != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(sourceAS));
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "Dst AS":
+			} else if (qString.equals("Dst AS")){
 				long destinationAS = Long.parseLong(fields.get(i));
 				if (destinationAS != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(destinationAS));
 					values.add(cfqValue);
 				}
-				break;	
+				continue;	
 				
-			case "SMask":
+			} else if (qString.equals("SMask")){
 				if (!fields.get(i).equals("0")){
 					InetAddress address = InetAddress.getByName(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), address.getAddress());
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "DMask":
+			} else if (qString.equals("DMask")){
 				if (!fields.get(i).equals("0")){
 					InetAddress address = InetAddress.getByName(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), address.getAddress());
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "Dir":
+			} else if (qString.equals("Dir")){
 				if (fields.get(i).equals("I")){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(false));
 					values.add(cfqValue);
@@ -200,90 +197,78 @@ public class NetFlowV5Record {
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(true));
 					values.add(cfqValue);
 				} else {
-					System.err.println("Unable to recognize Direction (I/E): " + fields.get(i));
+					System.err.println("Unable to recognize Direction (I/E))){ " + fields.get(i));
 				}
-				break;
-				//,Next-hop IP  ,BGP next-hop IP ,SVlan ,DVlan   ," +
-//				"In src MAC Addr  ,Out dst MAC Addr   ,In dst MAC Addr  ,Out src MAC Addr  ,MPLS lbl 1   ,MPLS lbl 2   ," +
-//				"MPLS lbl 3   ,MPLS lbl 4"
-			case "Next-hop IP":
+				continue;
+				
+			} else if (qString.equals("Next-hop IP")){
 				if (!fields.get(i).equals("0.0.0.0")){
 					InetAddress address = InetAddress.getByName(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), address.getAddress());
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "BGP next-hop IP":
+			} else if (qString.equals("BGP next-hop IP")){
 				if (!fields.get(i).equals("0.0.0.0")){
 					InetAddress address = InetAddress.getByName(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), address.getAddress());
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "Router IP":
+			} else if (qString.equals("Router IP")){
 				if (!fields.get(i).equals("0.0.0.0")){
 					InetAddress address = InetAddress.getByName(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), address.getAddress());
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "SVlan":
+			} else if (qString.equals("SVlan")){
 				short svlan = Short.parseShort(fields.get(i));
 				if (svlan != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(svlan));
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "DVlan":
+			} else if (qString.equals("DVlan")){
 				short dvlan = Short.parseShort(fields.get(i));
 				if (dvlan != 0){
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), Bytes.toBytes(dvlan));
 					values.add(cfqValue);
 				}
-				break;
+				continue;
 				
-			case "In src MAC Addr":
+			} else if (qString.equals("In src MAC Addr")){
 				if (!fields.get(i).equals("00:00:00:00:00:00")){
 					MacAddress mac = new MacAddress(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), mac.getBytes());
 					values.add(cfqValue);
 				}
-				break;
-			case "Out dst MAC Addr":
+				continue;
+			} else if (qString.equals("Out dst MAC Addr")){
 				if (!fields.get(i).equals("00:00:00:00:00:00")){
 					MacAddress mac = new MacAddress(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), mac.getBytes());
 					values.add(cfqValue);
 				}
-				break;
-			case "In dst MAC Addr":
+				continue;
+			} else if (qString.equals("In dst MAC Addr")){
 				if (!fields.get(i).equals("00:00:00:00:00:00")){
 					MacAddress mac = new MacAddress(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), mac.getBytes());
 					values.add(cfqValue);
 				}
-				break;
-			case "Out src MAC Addr":
+				continue;
+			} else if (qString.equals("Out src MAC Addr")){
 				if (!fields.get(i).equals("00:00:00:00:00:00")){
 					MacAddress mac = new MacAddress(fields.get(i));
 					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), mac.getBytes());
 					values.add(cfqValue);
 				}
-				break;
-//			case "MPLS lbl 1":
-//				if (!fields.get(i).equals("0-0-0")){
-//					cfqValue = new CFQValue(families.get(i), qualifiers.get(i), mac.getBytes());
-//					values.add(cfqValue);
-//				}
-//				break;
-			
-				
-			default:
-				break;
+				continue;
 			}
 		}
 		return values;
@@ -296,124 +281,93 @@ public class NetFlowV5Record {
 		String qualifier = Utils.getColumnQualifierString(cfqValue.getQualifier());
 		String value = null;
 		
-		switch (qualifier) {
-		case "Date flow end":
+		if (qualifier.equals("Date flow end")) {
 			value = new Date(Bytes.toLong(cfqValue.getValue())).toString();
-			break;
-
-		case "Proto":
+		} else if(qualifier.equals("Proto")){
 			value = Bytes.toShort(cfqValue.getValue())+"";
-			break;
-			
+		} else if(qualifier.equals("Flags")){
 		// FIXME: use 9 bits to handle flags, instead of using a string.
-		case "Flags":
 			value = new String(cfqValue.getValue());
-			break;
-			
-		case "Fwd":	
+		} else if(qualifier.equals("Fwd")){
 			value = Bytes.toShort(cfqValue.getValue())+"";
-			break;
 			
-		case "STos":
+		} else if(qualifier.equals("STos")){
 			value = Bytes.toShort(cfqValue.getValue()) + "";
-			break;
+			
+		} else if(qualifier.equals("DTos")){
+			value = Bytes.toShort(cfqValue.getValue()) + "";
 
-		case "DTos":
-			value = Bytes.toShort(cfqValue.getValue()) + "";
-			break;
-			
-		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-		case "In Pkt":
+		} else if(qualifier.equals("In Pkt")){
 			value = Bytes.toLong(cfqValue.getValue())+"";
-			break;
-			
-		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-		case "Out Pkt":
+		
+		} else if(qualifier.equals("Out Pkt")){
+			//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
 			value = Bytes.toLong(cfqValue.getValue())+"";
-			break;
 			
-		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-		case "In Byte":
+		} else if(qualifier.equals("In Byte")){
+			//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
 			value = Bytes.toLong(cfqValue.getValue())+"";
-			break;				
 			
-		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-		case "Out Byte":
+		} else if(qualifier.equals("Out Byte")){
+			//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
 			value = Bytes.toLong(cfqValue.getValue())+"";
-			break;		
 			
-		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
-		case "Flows":
+		} else if(qualifier.equals("Flows")){
 			value = Bytes.toLong(cfqValue.getValue())+"";
-			break;
-			// Input ," +
-//			"Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      
 			
-		case "Input":
+		} else if(qualifier.equals("Input")){
 			value = Bytes.toShort(cfqValue.getValue())+"";
-			break;
-			
-		case "Output":
+
+		} else if(qualifier.equals( "Output")){
 			value = Bytes.toShort(cfqValue.getValue())+"";
-			break;
 			
-		case "Src AS":
+		} else if(qualifier.equals( "Src AS")){
 			value = Bytes.toLong(cfqValue.getValue())+"";
-			break;
 			
-		case "Dst AS":
+		} else if(qualifier.equals( "Dst AS")){
 			value = Bytes.toLong(cfqValue.getValue())+"";
-			break;	
 			
-		case "SMask":
+		} else if(qualifier.equals( "SMask")){
 			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
-			break;
 			
-		case "DMask":
+		} else if(qualifier.equals( "DMask")){
 			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
-			break;
 			
-		case "Dir":
+		} else if(qualifier.equals( "Dir")){
 			boolean dir = Bytes.toBoolean(cfqValue.getValue());
 			if (dir){
 				value = "Egress";
 			} else {
 				value = "Ingress";
 			}
-			break;
 
-		case "Next-hop IP":
+		} else if(qualifier.equals( "Next-hop IP")){
 			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
-			break;
 			
-		case "BGP next-hop IP":
+		} else if(qualifier.equals( "BGP next-hop IP")){
 			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
-			break;
 			
-		case "Router IP":
+		} else if(qualifier.equals( "Router IP")){
 			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
-			break;
 			
-		case "SVlan":
+		} else if(qualifier.equals( "SVlan")){
 			value = Bytes.toShort(cfqValue.getValue())+"";
-			break;
 			
-		case "DVlan":
+		} else if(qualifier.equals( "DVlan")){
 			value = Bytes.toShort(cfqValue.getValue())+"";
-			break;
 			
-		case "In src MAC Addr":
+		} else if(qualifier.equals( "In src MAC Addr")){
 			value = new MacAddress(cfqValue.getValue()).toString();
-			break;
-		case "Out dst MAC Addr":
+
+		} else if(qualifier.equals( "Out dst MAC Addr")){
 			value = new MacAddress(cfqValue.getValue()).toString();
-			break;
-		case "In dst MAC Addr":
+
+		} else if(qualifier.equals( "In dst MAC Addr")){
 			value = new MacAddress(cfqValue.getValue()).toString();
-			break;
-		case "Out src MAC Addr":
+
+		} else if(qualifier.equals( "Out src MAC Addr")){
 			value = new MacAddress(cfqValue.getValue()).toString();
-			break;
+		}
 //		case "MPLS lbl 1":
 //			if (!fields.get(i).equals("0-0-0")){
 //				cfqValue = new CFQValue(families.get(i), qualifiers.get(i), mac.getBytes());
@@ -422,9 +376,135 @@ public class NetFlowV5Record {
 //			break;
 		
 			
-		default:
-			break;
-		}
+//		switch (qualifier) {
+//		case "Date flow end":
+//			value = new Date(Bytes.toLong(cfqValue.getValue())).toString();
+//			break;
+//
+//		case "Proto":
+//			value = Bytes.toShort(cfqValue.getValue())+"";
+//			break;
+//			
+//		// FIXME: use 9 bits to handle flags, instead of using a string.
+//		case "Flags":
+//			value = new String(cfqValue.getValue());
+//			break;
+//			
+//		case "Fwd":	
+//			value = Bytes.toShort(cfqValue.getValue())+"";
+//			break;
+//			
+//		case "STos":
+//			value = Bytes.toShort(cfqValue.getValue()) + "";
+//			break;
+//
+//		case "DTos":
+//			value = Bytes.toShort(cfqValue.getValue()) + "";
+//			break;
+//			
+//		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+//		case "In Pkt":
+//			value = Bytes.toLong(cfqValue.getValue())+"";
+//			break;
+//			
+//		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+//		case "Out Pkt":
+//			value = Bytes.toLong(cfqValue.getValue())+"";
+//			break;
+//			
+//		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+//		case "In Byte":
+//			value = Bytes.toLong(cfqValue.getValue())+"";
+//			break;				
+//			
+//		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+//		case "Out Byte":
+//			value = Bytes.toLong(cfqValue.getValue())+"";
+//			break;		
+//			
+//		//FIXME: use 4-bytes instead of long/8-bytes. Is that even meaningful
+//		case "Flows":
+//			value = Bytes.toLong(cfqValue.getValue())+"";
+//			break;
+//			// Input ," +
+////			"Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      
+//			
+//		case "Input":
+//			value = Bytes.toShort(cfqValue.getValue())+"";
+//			break;
+//			
+//		case "Output":
+//			value = Bytes.toShort(cfqValue.getValue())+"";
+//			break;
+//			
+//		case "Src AS":
+//			value = Bytes.toLong(cfqValue.getValue())+"";
+//			break;
+//			
+//		case "Dst AS":
+//			value = Bytes.toLong(cfqValue.getValue())+"";
+//			break;	
+//			
+//		case "SMask":
+//			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
+//			break;
+//			
+//		case "DMask":
+//			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
+//			break;
+//			
+//		case "Dir":
+//			boolean dir = Bytes.toBoolean(cfqValue.getValue());
+//			if (dir){
+//				value = "Egress";
+//			} else {
+//				value = "Ingress";
+//			}
+//			break;
+//
+//		case "Next-hop IP":
+//			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
+//			break;
+//			
+//		case "BGP next-hop IP":
+//			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
+//			break;
+//			
+//		case "Router IP":
+//			value = InetAddress.getByAddress(cfqValue.getValue()).getHostAddress();
+//			break;
+//			
+//		case "SVlan":
+//			value = Bytes.toShort(cfqValue.getValue())+"";
+//			break;
+//			
+//		case "DVlan":
+//			value = Bytes.toShort(cfqValue.getValue())+"";
+//			break;
+//			
+//		case "In src MAC Addr":
+//			value = new MacAddress(cfqValue.getValue()).toString();
+//			break;
+//		case "Out dst MAC Addr":
+//			value = new MacAddress(cfqValue.getValue()).toString();
+//			break;
+//		case "In dst MAC Addr":
+//			value = new MacAddress(cfqValue.getValue()).toString();
+//			break;
+//		case "Out src MAC Addr":
+//			value = new MacAddress(cfqValue.getValue()).toString();
+//			break;
+////		case "MPLS lbl 1":
+////			if (!fields.get(i).equals("0-0-0")){
+////				cfqValue = new CFQValue(families.get(i), qualifiers.get(i), mac.getBytes());
+////				values.add(cfqValue);
+////			}
+////			break;
+//		
+//			
+//		default:
+//			break;
+//		}
 		int size = cfqValue.getColumnFamily().length + cfqValue.getQualifier().length + cfqValue.getValue().length;
 		return family+ ":" + cfqValue.getQualifier()[0] + ":" + value + "(Size: " + size + ", Qualifier String: " + qualifier  + " )";
 	}

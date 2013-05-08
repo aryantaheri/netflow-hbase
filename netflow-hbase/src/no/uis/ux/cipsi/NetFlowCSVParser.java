@@ -355,7 +355,7 @@ public class NetFlowCSVParser {
 	}
 	
 	public List<CFQValue> prepareValuesT1(List<String> allFields){
-		List<String> fields = new ArrayList<>(allFields);
+		List<String> fields = new ArrayList<String>(allFields);
 		
 		List<CFQValue> cfqValues = new ArrayList<CFQValue>();
 		// Removing RowKey elements
@@ -746,13 +746,30 @@ public class NetFlowCSVParser {
 		int daIdx = RowKeyFields.DST_ADDRESS.getIdx(table);
 		int dpIdx = RowKeyFields.DST_PORT.getIdx(table);
 		int tsIdx = RowKeyFields.FIRST_SEEN.getIdx(table);
+		String[] orderedkey = new String[5];
+		String output = "Table" + table + ", ";
+		
 		try {
-			return "Table" + table + ", Source IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, saIdx*4, (saIdx+1)*4)).getHostAddress() +
-					",Source Port: " + Bytes.toInt(Arrays.copyOfRange(input, spIdx*4, (spIdx+1)*4)) +
-					",Destination IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, daIdx*4, (daIdx+1)*4)).getHostAddress() +
-					",Destination Port: " + Bytes.toInt(Arrays.copyOfRange(input, dpIdx*4, (dpIdx+1)*4)) +
-					",FirstSeen: " + new Date(Long.MAX_VALUE - Bytes.toLong(Arrays.copyOfRange(input, tsIdx*4, (tsIdx+2)*4))) +
-					",KeySize: " + input.length;
+			orderedkey[saIdx] = "Source IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, saIdx*4, (saIdx+1)*4)).getHostAddress();
+			orderedkey[spIdx] = "Source Port: " + Bytes.toInt(Arrays.copyOfRange(input, spIdx*4, (spIdx+1)*4));
+			orderedkey[daIdx] = "Destination IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, daIdx*4, (daIdx+1)*4)).getHostAddress();
+			orderedkey[dpIdx] = "Destination Port: " + Bytes.toInt(Arrays.copyOfRange(input, dpIdx*4, (dpIdx+1)*4));
+			orderedkey[tsIdx] = "FirstSeen: " + new Date(Long.MAX_VALUE - Bytes.toLong(Arrays.copyOfRange(input, tsIdx*4, (tsIdx+2)*4)));
+			
+			for (int i = 0; i < orderedkey.length; i++) {
+				output = output.concat(orderedkey[i]).concat(", ");
+			}
+			
+			output = output.concat("KeySize: " + input.length);
+			
+			return output;
+			
+//			return "Table" + table + ", Source IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, saIdx*4, (saIdx+1)*4)).getHostAddress() +
+//					",Source Port: " + Bytes.toInt(Arrays.copyOfRange(input, spIdx*4, (spIdx+1)*4)) +
+//					",Destination IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, daIdx*4, (daIdx+1)*4)).getHostAddress() +
+//					",Destination Port: " + Bytes.toInt(Arrays.copyOfRange(input, dpIdx*4, (dpIdx+1)*4)) +
+//					",FirstSeen: " + new Date(Long.MAX_VALUE - Bytes.toLong(Arrays.copyOfRange(input, tsIdx*4, (tsIdx+2)*4))) +
+//					",KeySize: " + input.length;
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return null;
