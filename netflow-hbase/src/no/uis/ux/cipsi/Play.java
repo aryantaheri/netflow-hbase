@@ -20,6 +20,7 @@ import org.apache.hadoop.hbase.HBaseConfiguration;
 import org.apache.hadoop.hbase.KeyValue;
 import org.apache.hadoop.hbase.client.Get;
 import org.apache.hadoop.hbase.client.HTable;
+import org.apache.hadoop.hbase.client.Put;
 import org.apache.hadoop.hbase.client.Result;
 import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
@@ -281,23 +282,54 @@ public class Play {
         }
     }
 	
+    private static void putPortPlay(Configuration conf){
+    	try {
+			HTable table = new HTable(conf, "PortTable");
+			for (int i = 0; i < 65536; i++) {			
+				Put p = new Put(Bytes.toBytes(i));
+				p.add(Bytes.toBytes("d"), Bytes.toBytes("q"), Bytes.toBytes("v"));
+				table.put(p);
+			}
+			table.flushCommits();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
+    private static void putIPPlay(Configuration conf){
+    	try {
+			HTable table = new HTable(conf, "IPTable");
+			InetAddress address;
+			for (int i = 0; i < 65536; i++) {			
+				Put p = new Put(InetAddress.getByName((i % 255)+".1.1.1").getAddress());
+				p.add(Bytes.toBytes("d"), Bytes.toBytes("q"), Bytes.toBytes("v"));
+				table.put(p);
+			}
+			table.flushCommits();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+    }
+    
     private static void hbaseClient(){
 		Configuration conf = HBaseConfiguration.create();
 		try {
-			InetAddress address = InetAddress.getByName("192.216.59.74");
+			InetAddress address = InetAddress.getByName("191.220.195.154");
 //			byte[] rowkey = Bytes.add(address.getAddress(), Bytes.toBytes(Integer.parseInt("119")));
 			ByteBuffer buffer = ByteBuffer.allocate(8);
 			buffer.put(address.getAddress());
-			buffer.put(Bytes.toBytes(Integer.parseInt("119")));
+			buffer.put(Bytes.toBytes(Integer.parseInt("80")));
 			byte[] rowkey = buffer.array();
 //			byte[] rowkey = address.getAddress();
 //			byte[] rowkey = Bytes.head(address.getAddress(), 1);
 //			byte[] rowkey = Bytes.toBytes(1362308365166l);
-			getRecords(conf, "T1", rowkey);
+//			getRecords(conf, "T1", rowkey);
+//			putIPPlay(conf);
+			putPortPlay(conf);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-//			getAllRecord(conf, "netflowsample");
+//			getAllRecord(conf, "T1");
 	}
 	
 	public static void intOp(){
