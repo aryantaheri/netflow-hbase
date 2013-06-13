@@ -10,9 +10,15 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -26,9 +32,16 @@ import org.apache.hadoop.hbase.client.ResultScanner;
 import org.apache.hadoop.hbase.client.Scan;
 import org.apache.hadoop.hbase.filter.InclusiveStopFilter;
 import org.apache.hadoop.hbase.util.Bytes;
+import org.apache.hadoop.io.LongWritable;
+import org.apache.hadoop.io.Text;
+import org.apache.hadoop.thirdparty.guava.common.base.CharMatcher;
+import org.apache.hadoop.thirdparty.guava.common.base.Functions;
+import org.apache.hadoop.thirdparty.guava.common.base.Splitter;
+import org.apache.hadoop.thirdparty.guava.common.collect.ImmutableSet;
+import org.apache.hadoop.thirdparty.guava.common.collect.ImmutableSortedMap;
+import org.apache.hadoop.thirdparty.guava.common.collect.Ordering;
 import org.apache.http.util.ByteArrayBuffer;
 
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 
 public class Play {
@@ -129,6 +142,51 @@ public class Play {
 //		} catch (UnknownHostException e) {
 //			// TODO Auto-generated catch block
 //			e.printStackTrace();
+//		}
+	}
+	
+	private static void hashmaps() {
+		final HashMap<String, Long> srcDstTraffic = new HashMap<String, Long>();
+		srcDstTraffic.put("ip1:ip2", 2l);
+		srcDstTraffic.put("ip3:ip3", 4l);
+		srcDstTraffic.put("ip3:ip4", 1l);
+		srcDstTraffic.put("ip5:ip4", 5l);
+		srcDstTraffic.put("ip6:ip4", 2l);
+		
+		int N = 3;
+		
+		Set<String> keySet = srcDstTraffic.keySet();
+		String[] keyArray = keySet.toArray(new String[keySet.size()]);
+		Arrays.sort(keyArray, new Comparator<String>(){
+			@Override
+		    public int compare(String o1, String o2) {
+		      // sort descending
+		      return Long.compare(srcDstTraffic.get(o2), srcDstTraffic.get(o1));
+		    }
+		});
+		
+		ArrayList<Text> texts = new ArrayList<Text>();
+		ArrayList<LongWritable> values = new ArrayList<LongWritable>();
+		Text key = new Text();
+		LongWritable value = new LongWritable();
+		for (int i = 0; i < Math.min(keyArray.length, N); i++) {
+			System.out.print(keyArray[i] + " ");
+			System.out.println(srcDstTraffic.get(keyArray[i]));
+			key.set(keyArray[i]);
+			value.set(srcDstTraffic.get(keyArray[i]));
+			texts.add(key);
+			values.add(value);
+			
+		}
+		for (int i = 0; i < texts.size(); i++) {
+			System.out.print(texts.get(i));
+			System.out.println(values.get(i));
+		}
+//		System.out.println((LongWritable) 13l);
+//		Ordering valueComparator = Ordering.natural().onResultOf(Functions.forMap(srcDstTraffic));
+//		ImmutableSortedMap sortedMap = ImmutableSortedMap.copyOf(srcDstTraffic, valueComparator);
+//		for (int i = 0; i < sortedMap.entrySet().size(); i++) {
+//			System.out.println(sortedMap.entrySet().toArray()[i]);
 //		}
 	}
 	
@@ -237,8 +295,8 @@ public class Play {
         	first = true;
 	        for(KeyValue kv : r.raw()){
 	        	if (first){
-	        		System.out.println(NetFlowCSVParser.decodeRowKeyT1(kv.getRow()));
-	        		System.out.println(bytesToBits(kv.getRow()));
+	        		System.out.println(NetFlowCSVParser.decodeRowKey(kv.getRow(),1));
+//	        		System.out.println(bytesToBits(kv.getRow()));
 //		            System.out.print(kv.getTimestamp() + " " );
 //		            System.out.println(NetFlowV5Record.decodeCFQValues(new CFQValue(kv.getFamily(), kv.getQualifier(), kv.getValue())));
 //		            System.out.println("****************");
@@ -323,9 +381,9 @@ public class Play {
 //			byte[] rowkey = address.getAddress();
 //			byte[] rowkey = Bytes.head(address.getAddress(), 1);
 //			byte[] rowkey = Bytes.toBytes(1362308365166l);
-//			getRecords(conf, "T1", rowkey);
+			getRecords(conf, "T1", rowkey);
 //			putIPPlay(conf);
-			putPortPlay(conf);
+//			putPortPlay(conf);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -353,6 +411,14 @@ public class Play {
 		}
 		return bits;
 	}
+	private static void splitter(){
+//		String record = "Table1, Source IP: 191.220.195.154, Source Port: 80, Destination IP: 0.3.125.250, Destination Port: 1344, FirstSeen: Mon Mar 11 02:11:22 CET 2013, KeySize: 24";
+		Iterator<String> tokens = Splitter.onPattern("\\s+").trimResults().split(new String("107.150.145.204:192.239.62.5  		483919432000")).iterator();
+		String ipPair = tokens.next();
+		Long traffic = Long.parseLong(tokens.next());
+		System.out.println(ipPair + " " + traffic);
+//		Splitter.on(",").trimResults().
+	}
 	public static void main(String[] args) {
 //		ArrayList<String> columnStrings = Lists.newArrayList(
 //		        Splitter.on(',').trimResults().split("ab ,b,c"));
@@ -362,7 +428,10 @@ public class Play {
 //		byteBuffer();
 //		lists();
 //		byteop();
-		hbaseClient();
+//		hbaseClient();
+//		extractFieldValue();
+//		hashmaps();
+		splitter();
 //		intOp();
 //		System.out.println(byteToBits((byte)10));
 	}

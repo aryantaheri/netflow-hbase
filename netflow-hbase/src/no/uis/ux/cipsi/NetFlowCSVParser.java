@@ -776,6 +776,26 @@ public class NetFlowCSVParser {
 		}
 	}
 	
+	public static String getDecodedSrcIPRowKey(byte[] input, int table){
+		try {
+			int saIdx = RowKeyFields.SRC_ADDRESS.getIdx(table);
+			return InetAddress.getByAddress(Arrays.copyOfRange(input, saIdx*4, (saIdx+1)*4)).getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public static String getDecodedDstIPRowKey(byte[] input, int table){
+		try {
+			int daIdx = RowKeyFields.DST_ADDRESS.getIdx(table);
+			return InetAddress.getByAddress(Arrays.copyOfRange(input, daIdx*4, (daIdx+1)*4)).getHostAddress();
+		} catch (UnknownHostException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
 	private static void printRowValues(List<CFQValue> values){
 		for (CFQValue cfqValue : values) {
 			System.out.println(new String(cfqValue.getColumnFamily())+ ":" +
@@ -835,5 +855,19 @@ public class NetFlowCSVParser {
 				
 		
 		
+	}
+	private static NetFlowCSVParser netFlowCSVParser;
+	public static NetFlowCSVParser getInstance(){
+		if(netFlowCSVParser == null){
+			netFlowCSVParser = new NetFlowCSVParser(
+					"Date flow start,Date flow end,Duration,Src IP Addr,"
+							+ "Dst IP Addr, Src Pt, Dst Pt ,Proto  ,Flags ,Fwd ,STos   ,In Pkt  ,In Byte  ,Out Pkt ,Out Byte  ,Flows ,Input ,"
+							+ "Output ,Src AS ,Dst AS ,SMask ,DMask ,DTos ,Dir      ,Next-hop IP  ,BGP next-hop IP ,SVlan ,DVlan   ,"
+							+ "In src MAC Addr  ,Out dst MAC Addr   ,In dst MAC Addr  ,Out src MAC Addr  , Router IP, MPLS lbl 1   ,MPLS lbl 2   ,"
+							+ "MPLS lbl 3   ,MPLS lbl 4", false);
+			return netFlowCSVParser;
+		} else {
+			return netFlowCSVParser;
+		}
 	}
 }
