@@ -312,12 +312,37 @@ public class Play {
     }
     /**
      * Scan (or list) a table
+     * @throws ParseException 
      */
-    public static void getAllRecord (Configuration conf, String tableName) {
+    public static void getAllRecord (Configuration conf, String tableName) throws ParseException {
         try{
              HTable table = new HTable(conf, tableName);
-             Scan s = new Scan();
-             ResultScanner ss = table.getScanner(s);
+             Scan scan = new Scan();
+             scan.addColumn("d".getBytes(), Utils.getColumnQualifier("In Byte"));
+     		scan.addColumn("d".getBytes(), Utils.getColumnQualifier("Out Byte"));
+     		//69.198.15.10, 190.119.204.154, 51357,    80,0
+     		// 161.220.168.35,     79.23.96.85,    80, 45097
+     		String src = "161.220.168.35"; 
+     		String srcPort = "80";
+     		String dst = "79.23.96.85";
+     		String dstPort = "45097";//"45097"
+     		
+     		// check this one:::: the order of time stamps should be changed due to their reverse order in hbase.
+     		String ts2 = "2012-10-28 00:00:00";
+     		String ts1 = "2013-05-30 00:00:00";
+     		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    	    long startTime = dateFormat.parse(ts1).getTime();
+    	    long endTime = dateFormat.parse(ts2).getTime();
+     		// Rowkey filters
+     		byte[] rowkeyStart = NetFlowCSVParser.prepareRowKeyT1Simple(src, srcPort, dst, dstPort, startTime);
+     		byte[] rowkeyEnd = NetFlowCSVParser.prepareRowKeyT1Simple(src, srcPort, dst, dstPort, endTime);
+     		
+     		
+     		scan.setStartRow(rowkeyStart);
+     		scan.setStopRow(rowkeyEnd);
+//     		scan.setStopRow(rowKeyStop);
+     		
+             ResultScanner ss = table.getScanner(scan);
              int count = 0;
              boolean first = true;
              for(Result r:ss){
@@ -340,6 +365,35 @@ public class Play {
         }
     }
 	
+    private static void serviceDiscovery(Configuration conf, String servicePort) throws IOException{
+        HTable table = new HTable(conf, "NST5");
+        Scan scan = new Scan();
+		byte[] rowkeyStart = Bytes.toBytes(Integer.parseInt(servicePort));
+		byte[] rowkeyEnd = Bytes.toBytes(Integer.parseInt(servicePort) + 1);
+ 		scan.setStartRow(rowkeyStart);
+ 		scan.setStopRow(rowkeyEnd);
+        ResultScanner ss = table.getScanner(scan);
+        int count = 0;
+        boolean first = true;
+        for(Result r:ss){
+       	 first = true;
+       	 for(KeyValue kv : r.raw()){
+                if (first){
+               	 System.out.println(NetFlowCSVParser.decodeRowKey(kv.getRow(), 5));
+               	 System.out.print(bytesToBits(kv.getRow()));
+               	 System.out.println();
+//                    System.out.println("KeyValue TS: " + new Date(kv.getTimestamp()));
+               	 first = false;
+                }
+//                System.out.println(NetFlowV5Record.decodeCFQValues(new CFQValue(kv.getFamily(), kv.getQualifier(), kv.getValue())));
+            }
+            count++;
+        }
+        System.out.println("Returned results: " + count);
+
+ 		
+    }
+    
     private static void putPortPlay(Configuration conf){
     	try {
 			HTable table = new HTable(conf, "PortTable");
@@ -381,13 +435,14 @@ public class Play {
 //			byte[] rowkey = address.getAddress();
 //			byte[] rowkey = Bytes.head(address.getAddress(), 1);
 //			byte[] rowkey = Bytes.toBytes(1362308365166l);
-			getRecords(conf, "T1", rowkey);
+//			getRecords(conf, "T1", rowkey);
 //			putIPPlay(conf);
 //			putPortPlay(conf);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 //			getAllRecord(conf, "T1");
+			serviceDiscovery(conf, "22");
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
 	}
 	
 	public static void intOp(){
@@ -428,10 +483,10 @@ public class Play {
 //		byteBuffer();
 //		lists();
 //		byteop();
-//		hbaseClient();
+		hbaseClient();
 //		extractFieldValue();
 //		hashmaps();
-		splitter();
+//		splitter();
 //		intOp();
 //		System.out.println(byteToBits((byte)10));
 	}

@@ -118,17 +118,17 @@ public class SrcDstTrafficQuery {
 	      System.err.println("Wrong number of arguments: " + otherArgs.length);
 	      System.exit(-1);
 	    }
-	    String src = args[0];
+	    String src = otherArgs[0];
 //	    System.out.println(src);
-	    String srcPort = args[1];
+	    String srcPort = otherArgs[1];
 //	    System.out.println(srcPort);
-	    String dst = args[2];
+	    String dst = otherArgs[2];
 //	    System.out.println(dst);
-	    String dstPort = args[3];
+	    String dstPort = otherArgs[3];
 //	    System.out.println(dstPort);
-	    String ts1 = args[4];
+	    String ts1 = otherArgs[4];
 //	    System.out.println(ts1);
-	    String ts2 = args[5];
+	    String ts2 = otherArgs[5];
 //	    System.out.println(ts2);
 	    
 	    String output = "/netflow-query/src-dst-traffic";

@@ -23,8 +23,8 @@ public class ServiceServerDiscoveryQuery {
 
 	private static void hbaseServiceServerDiscovery(Configuration conf,
 			int servicePort, InetAddress serviceClient, long startTime,
-			long endTime) throws IOException {
-		HTable table = new HTable(conf, "T7");
+			long endTime, String tableName) throws IOException {
+		HTable table = new HTable(conf, tableName);
 		Scan scan = new Scan();
 
 		// 8 = port(4) + ip(4)
@@ -97,6 +97,12 @@ public class ServiceServerDiscoveryQuery {
 		String ts2 = otherArgs[3];
 		System.out.println(ts2);
 		
+		String tableName = "T7";
+		if (otherArgs.length == 5) {
+			tableName = otherArgs[4];
+		}
+		System.out.println("Table: " + tableName);
+		
 		
 
 		
@@ -109,7 +115,7 @@ public class ServiceServerDiscoveryQuery {
 		long startTime = dateFormat.parse(ts1).getTime();
 		long endTime = dateFormat.parse(ts2).getTime();
 
-		hbaseServiceServerDiscovery(conf, service, client, startTime, endTime);
+		hbaseServiceServerDiscovery(conf, service, client, startTime, endTime, tableName);
 		long qend = System.currentTimeMillis();
 		System.out.println("Duration: " + (qend - qstart));
 	}

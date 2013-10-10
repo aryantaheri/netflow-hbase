@@ -36,7 +36,8 @@ public class ServiceDiscoveryQuery {
 				org.apache.hadoop.mapreduce.Mapper.Context context)
 				throws IOException, InterruptedException {
 			Date ts = NetFlowCSVParser.getDecodedFirstSeenRowKey(key.get(), 5);
-			
+			// check if ts is in the range, and continue with the process
+			// FIXME: complete map and reduce
 			String src = NetFlowCSVParser.getDecodedSrcIPRowKey(key.get(), 5);
 			String srcPort = NetFlowCSVParser.getDecodedSrcPortRowKey(key.get(), 5);
 			String dst = NetFlowCSVParser.getDecodedDstIPRowKey(key.get(), 5);
@@ -99,11 +100,11 @@ public class ServiceDiscoveryQuery {
 	      System.exit(-1);
 	    }
 	    
-	    String servicePort = args[0];
+	    String servicePort = otherArgs[0];
 	    System.out.println(servicePort);
-	    String ts1 = args[1];
+	    String ts1 = otherArgs[1];
 	    System.out.println(ts1);
-	    String ts2 = args[2];
+	    String ts2 = otherArgs[2];
 	    System.out.println(ts2);
 	    
 	    String output = "/netflow-query/service-discovery-"+servicePort;

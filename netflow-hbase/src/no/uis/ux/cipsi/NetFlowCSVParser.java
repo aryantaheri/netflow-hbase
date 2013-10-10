@@ -354,6 +354,30 @@ public class NetFlowCSVParser {
 		return output;
 	}
 	
+	static public byte[] prepareRowKeyT1Simple(String src, String srcPort,
+			String dst, String dstPort, long ts) throws UnknownHostException{
+		ByteBuffer rowkeyT1 = ByteBuffer.allocate(ROWKEY_T1_IPV4_BYTES);
+		byte[] output = new byte[ROWKEY_T1_IPV4_BYTES];
+		
+		InetAddress sAddress = InetAddress.getByName(src);
+		rowkeyT1.put(sAddress.getAddress());
+		
+		int sPort = Integer.parseInt(srcPort);
+		rowkeyT1.put(Bytes.toBytes(sPort));
+		
+		InetAddress dAddress = InetAddress.getByName(dst);
+		rowkeyT1.put(dAddress.getAddress());
+		
+		int dPort = Integer.parseInt(dstPort);
+		rowkeyT1.put(Bytes.toBytes(dPort));
+		
+		rowkeyT1.put(Bytes.toBytes(Long.MAX_VALUE - ts));
+		
+		output = rowkeyT1.array();
+		
+		return output;
+	}
+	
 	public List<CFQValue> prepareValuesT1(List<String> allFields){
 		List<String> fields = new ArrayList<String>(allFields);
 		
@@ -764,12 +788,6 @@ public class NetFlowCSVParser {
 			
 			return output;
 			
-//			return "Table" + table + ", Source IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, saIdx*4, (saIdx+1)*4)).getHostAddress() +
-//					",Source Port: " + Bytes.toInt(Arrays.copyOfRange(input, spIdx*4, (spIdx+1)*4)) +
-//					",Destination IP: " + InetAddress.getByAddress(Arrays.copyOfRange(input, daIdx*4, (daIdx+1)*4)).getHostAddress() +
-//					",Destination Port: " + Bytes.toInt(Arrays.copyOfRange(input, dpIdx*4, (dpIdx+1)*4)) +
-//					",FirstSeen: " + new Date(Long.MAX_VALUE - Bytes.toLong(Arrays.copyOfRange(input, tsIdx*4, (tsIdx+2)*4))) +
-//					",KeySize: " + input.length;
 		} catch (UnknownHostException e) {
 			e.printStackTrace();
 			return null;
@@ -786,6 +804,11 @@ public class NetFlowCSVParser {
 		}
 	}
 	
+	public static String getDecodedSrcPortRowKey(byte[] input, int table){
+		int spIdx = RowKeyFields.SRC_PORT.getIdx(table);
+		return Bytes.toInt(Arrays.copyOfRange(input, spIdx*4, (spIdx+1)*4)) + "";
+	}
+	
 	public static String getDecodedDstIPRowKey(byte[] input, int table){
 		try {
 			int daIdx = RowKeyFields.DST_ADDRESS.getIdx(table);
@@ -794,6 +817,16 @@ public class NetFlowCSVParser {
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public static String getDecodedDstPortRowKey(byte[] input, int table){
+		int dpIdx = RowKeyFields.DST_PORT.getIdx(table);
+		return Bytes.toInt(Arrays.copyOfRange(input, dpIdx*4, (dpIdx+1)*4)) + "";
+	}
+	
+	public static Date getDecodedFirstSeenRowKey(byte[] input, int table){
+		int tsIdx = RowKeyFields.FIRST_SEEN.getIdx(table);
+		return new Date(Long.MAX_VALUE - Bytes.toLong(Arrays.copyOfRange(input, tsIdx*4, (tsIdx+2)*4)));
 	}
 	
 	private static void printRowValues(List<CFQValue> values){
